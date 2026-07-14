@@ -6,6 +6,7 @@ to use it, and returns a structured tool call for your application to execute.
 ## Concept guides
 
 - [ReAct, Chain-of-Thought, and Reasoning Tokens](docs/react_and_cot.md)
+- [How an Agent Uses an External API](docs/agents_using_apis.md)
 
 ## Setup
 
@@ -49,6 +50,16 @@ python openai/tool_loop.py
 This example must first look up Alice's city and then use that result to request
 the city's weather. Its bounded loop continues through dependent tool rounds until
 the model returns a final answer.
+
+## OpenAI agent using an external API
+
+```bash
+python openai/api_tool_agent.py "Toronto"
+```
+
+This example shows both API layers: the application calls OpenAI's model API,
+while the model-selected tool calls Open-Meteo's live weather API. Open-Meteo
+does not require a second API key for this small example.
 
 ## What to notice
 
