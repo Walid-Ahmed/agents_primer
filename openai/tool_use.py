@@ -58,8 +58,8 @@ PROMPTS = [
 def run_prompt(client: OpenAI, prompt: str) -> None:
     """Ask the model, report function calls, then complete the tool-use loop."""
     response = client.responses.create(
-        # Luna is the efficient member of the current GPT-5.6 family.
-        model="gpt-5.6-luna",
+        # GPT-5 nano is the cheapest GPT-5 model and supports function calling.
+        model="gpt-5-nano",
         input=prompt,
         tools=TOOLS,  # Makes get_weather available to the model.
         # tool_choice defaults to "auto": zero or more calls are allowed.
@@ -98,7 +98,7 @@ def run_prompt(client: OpenAI, prompt: str) -> None:
 
     # 5. Continue the same response with the results from our application.
     final_response = client.responses.create(
-        model="gpt-5.6-luna",
+        model="gpt-5-nano",
         previous_response_id=response.id,
         input=function_outputs,
         tools=TOOLS,
