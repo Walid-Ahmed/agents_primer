@@ -1,10 +1,14 @@
-"""Minimal Anthropic tool-use example.
+"""Minimal Anthropic tool-use example with one tool-call round.
 
 Run from the repository root:
     python anthropic/tool_use.py
 
 The important lesson is that registering a tool does not force Claude to use it.
 Claude chooses whether to call it based on the prompt and tool description.
+
+This beginner example handles every tool call in Claude's first response, but it
+does not loop if Claude asks for another tool after seeing those results. See
+openai/tool_loop.py for the bounded while-loop pattern used by a real agent.
 """
 
 import os
@@ -96,7 +100,9 @@ def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
             }
         )
 
-    # 5. Send Claude its original response and our tool result.
+    # 5. Send Claude its original response and our tool results.
+    # This is one round only. Production agent code should inspect final_response
+    # for more tool_use blocks and repeat until Claude returns a final answer.
     messages.append({"role": "assistant", "content": response.content})
     messages.append({"role": "user", "content": tool_results})
 

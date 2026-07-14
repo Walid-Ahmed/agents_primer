@@ -36,6 +36,20 @@ python openai/tool_use.py
 Look for a structured output item whose `type` is `function_call`. The application
 executes the function and returns a `function_call_output` item to the model.
 
+This first example intentionally demonstrates **one tool-call round**. It handles
+multiple calls returned together, but it does not continue if the model asks for
+another tool after seeing their results.
+
+## OpenAI multi-round tool loop
+
+```bash
+python openai/tool_loop.py
+```
+
+This example must first look up Alice's city and then use that result to request
+the city's weather. Its bounded loop continues through dependent tool rounds until
+the model returns a final answer.
+
 ## What to notice
 
 - Passing `tools` registers a tool; it does not execute the Python function.

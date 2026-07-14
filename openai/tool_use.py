@@ -1,10 +1,14 @@
-"""Minimal OpenAI function-calling example using the Responses API.
+"""Minimal OpenAI function-calling example with one tool-call round.
 
 Run from the repository root:
     python openai/tool_use.py
 
 Registering a function makes it available to the model. It does not guarantee
 that the model will call it; the prompt and tool description guide that choice.
+
+This beginner example handles every function call in the first response, but it
+does not loop if the model requests another function after seeing those results.
+See tool_loop.py for a bounded while-loop that supports multiple rounds.
 """
 
 import json
@@ -97,6 +101,8 @@ def run_prompt(client: OpenAI, prompt: str) -> None:
         )
 
     # 5. Continue the same response with the results from our application.
+    # This is one round only. A full agent must inspect final_response for more
+    # function_call items and keep looping until it receives a final answer.
     final_response = client.responses.create(
         model="gpt-5-nano",
         previous_response_id=response.id,
