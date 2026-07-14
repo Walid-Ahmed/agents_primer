@@ -4,6 +4,7 @@ These examples show two ways an agent can use Model Context Protocol (MCP):
 
 1. **Local MCP:** you own the server and run it as a local subprocess.
 2. **External MCP:** OpenAI connects to a third-party server on the internet.
+3. **Authenticated API through MCP:** a local MCP server safely wraps Gmail.
 
 ## 1. Setup
 
@@ -109,8 +110,15 @@ personal data, or other secrets in the prompt.
 | `weather_server.py` | Local MCP server that publishes the weather tool |
 | `weather_agent.py` | Agent that launches and uses the local server |
 | `external_deepwiki_agent.py` | Agent using an internet-hosted MCP server |
+| `gmail_server.py` | Local MCP wrapper for Gmail draft/send actions |
+| `gmail_agent.py` | Agent with human approval required before sending |
 
-## 5. Direct tools versus MCP
+## 5. Gmail MCP example
+
+See [`GMAIL_README.md`](GMAIL_README.md) for OAuth setup and exact commands. The
+example creates a real Gmail draft but sends it only after you type `SEND`.
+
+## 6. Direct tools versus MCP
 
 The repository's `openai/api_tool_agent.py` registers the weather function
 directly with OpenAI. In the local MCP example, the server publishes the function
@@ -122,7 +130,7 @@ Local MCP:   MCP server owns schema + execution; agent connects over stdio
 Hosted MCP:  external server owns schema + execution; OpenAI connects by URL
 ```
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 ### `OPENAI_API_KEY` is missing
 
