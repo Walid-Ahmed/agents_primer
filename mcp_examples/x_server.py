@@ -1,3 +1,4 @@
+# What this file does: publishes a tool that creates a post through the X API.
 """Local MCP server exposing one consequential action: publish an X post."""
 
 import os

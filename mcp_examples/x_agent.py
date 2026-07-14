@@ -1,3 +1,4 @@
+# What this file does: drafts an X post and publishes only after user approval.
 """Ask the user for an idea, draft an X post, and publish only after approval."""
 
 import asyncio

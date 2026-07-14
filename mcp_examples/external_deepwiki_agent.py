@@ -1,3 +1,4 @@
+# What this file does: connects an OpenAI agent to DeepWiki's remote MCP server.
 """Minimal agent using an external MCP server hosted by DeepWiki.
 
 Run from the repository root:

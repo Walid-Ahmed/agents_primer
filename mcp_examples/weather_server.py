@@ -1,3 +1,4 @@
+# What this file does: publishes a live-weather tool from a local MCP server.
 """Local MCP server that exposes one live-weather tool over stdio.
 
 This process does not call a language model. It publishes a standard MCP tool

@@ -1,3 +1,4 @@
+# What this file does: lets an OpenAI agent call a live weather API tool.
 """Minimal agent whose tool calls a real external weather API.
 
 Run from the repository root:

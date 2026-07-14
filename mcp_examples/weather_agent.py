@@ -1,3 +1,4 @@
+# What this file does: connects an OpenAI agent to the local weather MCP server.
 """OpenAI agent that discovers and uses a local weather MCP server.
 
 Run from the repository root:

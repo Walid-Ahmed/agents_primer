@@ -1,3 +1,4 @@
+# What this file does: demonstrates one round of Anthropic tool calling.
 """Minimal Anthropic tool-use example with one tool-call round.
 
 Run from the repository root:

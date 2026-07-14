@@ -1,3 +1,4 @@
+# What this file does: publishes Gmail read, draft, and send tools through MCP.
 """Local MCP server exposing Gmail draft and send actions.
 
 ``send_draft`` really sends email. The client places a human approval check in

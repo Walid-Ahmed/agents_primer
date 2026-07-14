@@ -1,3 +1,4 @@
+# What this file does: demonstrates one round of OpenAI function calling.
 """Minimal OpenAI function-calling example with one tool-call round.
 
 Run from the repository root:

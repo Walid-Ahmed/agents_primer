@@ -1,3 +1,4 @@
+# What this file does: demonstrates a multi-round OpenAI tool loop.
 """Minimal multi-round tool loop using OpenAI's Responses API.
 
 Run from the repository root:

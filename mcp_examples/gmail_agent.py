@@ -1,3 +1,4 @@
+# What this file does: lets an agent read Gmail and draft or safely send email.
 """OpenAI + Gmail MCP agent with a human approval gate.
 
 Run:
