@@ -7,6 +7,7 @@ to use it, and returns a structured tool call for your application to execute.
 
 - [ReAct, Chain-of-Thought, and Reasoning Tokens](docs/react_and_cot.md)
 - [How an Agent Uses an External API](docs/agents_using_apis.md)
+- [A Local Weather Agent with MCP](docs/mcp_weather_agent.md)
 
 ## Setup
 
@@ -60,6 +61,30 @@ python openai/api_tool_agent.py "Toronto"
 This example shows both API layers: the application calls OpenAI's model API,
 while the model-selected tool calls Open-Meteo's live weather API. Open-Meteo
 does not require a second API key for this small example.
+
+## Local MCP weather agent
+
+See the [MCP examples README](mcp_examples/README.md) for complete setup,
+expected output, and troubleshooting.
+
+```bash
+python mcp_examples/weather_agent.py "Toronto"
+```
+
+This version publishes the live Open-Meteo capability from a local MCP server.
+The OpenAI agent launches the server over stdio, discovers its
+`get_current_weather` tool, calls it, and receives the result through MCP. No
+public MCP server or additional API key is required.
+
+## External MCP server
+
+```bash
+python mcp_examples/external_deepwiki_agent.py
+```
+
+This example connects OpenAI's hosted MCP tool to DeepWiki's public MCP server and
+asks a question about a public GitHub repository. It allow-lists only the read-only
+`ask_question` tool. Send only public information to third-party MCP servers.
 
 ## What to notice
 
