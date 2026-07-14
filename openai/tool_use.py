@@ -9,6 +9,12 @@ that the model will call it; the prompt and tool description guide that choice.
 This beginner example handles every function call in the first response, but it
 does not loop if the model requests another function after seeing those results.
 See tool_loop.py for a bounded while-loop that supports multiple rounds.
+
+Concept map:
+- Tool calling: YES. This is the main concept demonstrated here.
+- ReAct: NOT YET. A full ReAct-style agent must repeat tool-call rounds.
+- Chain-of-Thought (CoT): NO. The prompt does not request visible steps.
+- Reasoning tokens: NOT CONFIGURED OR INSPECTED in this lesson.
 """
 
 import json

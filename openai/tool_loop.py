@@ -9,6 +9,17 @@ The task needs two dependent tools:
 
 Because the second call depends on the first result, the application uses a
 bounded while loop instead of assuming one tool-call round will be enough.
+
+Concept map:
+- Tool calling: YES. The model requests structured function calls.
+- ReAct: YES, in the modern "ReAct-style" sense. The runtime repeatedly lets the
+  model decide, executes its action, returns an observation, and continues.
+- Chain-of-Thought (CoT): NO. We do not ask for or expose step-by-step reasoning.
+- Reasoning tokens: NOT CONFIGURED OR INSPECTED. They are separate from the loop.
+
+Modern APIs do not need literal "Thought / Action / Observation" text. Structured
+function calls are the actions, function outputs are the observations, and the
+model's private reasoning does not need to be shown.
 """
 
 import json

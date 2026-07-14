@@ -9,6 +9,12 @@ Claude chooses whether to call it based on the prompt and tool description.
 This beginner example handles every tool call in Claude's first response, but it
 does not loop if Claude asks for another tool after seeing those results. See
 openai/tool_loop.py for the bounded while-loop pattern used by a real agent.
+
+Concept map:
+- Tool calling: YES. This is the main concept demonstrated here.
+- ReAct: NOT YET. A full ReAct-style agent must repeat tool-call rounds.
+- Chain-of-Thought (CoT): NO. The prompt does not request visible steps.
+- Thinking tokens: NO. Extended thinking is not enabled or inspected here.
 """
 
 import os
