@@ -4,7 +4,7 @@
 Run from the repository root:
     python mcp_examples/external_deepwiki_agent.py
 
-Unlike weather_agent.py, this program does not launch a local MCP process.
+Unlike local_weather/weather_agent.py, this program does not launch a local MCP process.
 OpenAI's Responses API connects to https://mcp.deepwiki.com/mcp, discovers the
 allowed tool, calls it, and includes the result in the model's final answer.
 

@@ -32,17 +32,18 @@ activated.
 Run:
 
 ```bash
-python mcp_examples/weather_agent.py "Toronto"
+python mcp_examples/local_weather/weather_agent.py "Toronto"
 ```
 
 Try another city:
 
 ```bash
-python mcp_examples/weather_agent.py "Mexico City"
+python mcp_examples/local_weather/weather_agent.py "Mexico City"
 ```
 
+See [`local_weather/README.md`](local_weather/README.md) for the dedicated walkthrough.
 You do **not** start `weather_server.py` yourself. `weather_agent.py` launches it
-automatically using the MCP stdio transport and closes it when the agent finishes.
+automatically using MCP stdio and closes it when the agent finishes.
 
 ### What happens
 
@@ -108,8 +109,8 @@ personal data, or other secrets in the prompt.
 
 | File | Role |
 |---|---|
-| `weather_server.py` | Local MCP server that publishes the weather tool |
-| `weather_agent.py` | Agent that launches and uses the local server |
+| `local_weather/weather_server.py` | Local MCP server that publishes the weather tool |
+| `local_weather/weather_agent.py` | Agent that launches and uses the local server |
 | `external_deepwiki_agent.py` | Agent using an internet-hosted MCP server |
 | `gmail_server.py` | Local MCP wrapper for Gmail draft/send actions |
 | `gmail_agent.py` | Agent with human approval required before sending |

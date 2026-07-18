@@ -24,9 +24,75 @@ MCP separates the capability provider from the AI application:
 - `weather_server.py` owns the tool and calls Open-Meteo.
 - `weather_agent.py` connects to the server and uses whatever tools it publishes.
 
-The direct version in `openai/live_weather_api_agent.py` declares the schema, executes the
-function, and returns the result itself. The MCP version moves that interface and
-execution behind a standard protocol.
+The direct version in `openai/live_weather_api_agent.py` declares the schema,
+executes the function, and returns the result itself. The MCP version moves that
+interface and execution behind a standard protocol.
+
+## Direct function calling versus MCP
+
+Both weather examples use **tool calling**, and both ultimately call the same two
+Open-Meteo HTTP APIs:
+
+1. the geocoding API converts a city name into latitude and longitude;
+2. the forecast API retrieves current weather for those coordinates.
+
+This code is therefore an external API call, not an MCP operation:
+
+```python
+places = get_json(
+    "https://geocoding-api.open-meteo.com/v1/search",
+    {"name": city, "count": 1, "language": "en", "format": "json"},
+)
+```
+
+MCP changes how the model reaches the Python weather function; it does not replace
+the Open-Meteo API used inside that function.
+
+### Without MCP: direct OpenAI function calling
+
+In `openai/live_weather_api_agent.py`, the application manages the protocol:
+
+```text
+Model returns function_call
+    ↓
+Application parses arguments and runs get_current_weather()
+    ↓
+Application creates function_call_output
+    ↓
+Model receives the result and writes the final answer
+```
+
+The application manually defines the tool schema, detects the structured function
+call, executes Python, creates the matching output item, and sends it back.
+
+### With MCP
+
+In the local MCP example, the agent runtime and MCP connection manage those steps:
+
+```text
+Model selects discovered MCP tool
+    ↓
+MCP client sends the call to weather_server.py
+    ↓
+Server runs get_current_weather() and calls Open-Meteo
+    ↓
+MCP returns the result to the agent and model
+```
+
+`weather_agent.py` owns the model and agent behavior. `weather_server.py` owns the
+tool definition, execution, and Open-Meteo integration. FastMCP generates the tool
+schema from the decorated Python function.
+
+| Direct function calling | MCP tool calling |
+|---|---|
+| Application writes the provider-specific schema | FastMCP generates the schema |
+| Application detects and executes the function call | MCP runtime routes the call to the server |
+| Application creates `function_call_output` | MCP transports the tool result |
+| Tool is wired directly into one application | Compatible MCP clients can discover the tool |
+| Model logic and tool implementation can share one file | Client and capability provider are separated |
+
+The important takeaway is: **MCP does not replace function calling. It standardizes
+the connection between an agent and the system that provides the function.**
 
 ## What stdio means
 
@@ -42,7 +108,7 @@ stderr or a log file—not stdout.
 Install the dependencies and add `OPENAI_API_KEY` to `.env`, then run:
 
 ```bash
-python mcp_examples/weather_agent.py "Toronto"
+python mcp_examples/local_weather/weather_agent.py "Toronto"
 ```
 
 The program prints the tool discovered from the MCP server, followed by the

@@ -40,8 +40,8 @@ Follow this path if you are learning agents and tool calling from scratch:
    live weather data from Open-Meteo.
 7. [`docs/direct_tools_vs_mcp.md`](docs/direct_tools_vs_mcp.md) — learn why MCP moves
    tool discovery and execution behind a standard protocol.
-8. [`mcp_examples/weather_server.py`](mcp_examples/weather_server.py) followed by
-   [`mcp_examples/weather_agent.py`](mcp_examples/weather_agent.py) — inspect the
+8. [`mcp_examples/local_weather/weather_server.py`](mcp_examples/local_weather/weather_server.py) followed by
+   [`mcp_examples/local_weather/weather_agent.py`](mcp_examples/local_weather/weather_agent.py) — inspect the
    local MCP tool first, then run the agent that launches and uses it.
 9. [`mcp_examples/external_deepwiki_agent.py`](mcp_examples/external_deepwiki_agent.py)
    — connect to a hosted third-party MCP server for public information.
@@ -105,7 +105,7 @@ See the [MCP examples README](mcp_examples/README.md) for complete setup,
 expected output, and troubleshooting.
 
 ```bash
-python mcp_examples/weather_agent.py "Toronto"
+python mcp_examples/local_weather/weather_agent.py "Toronto"
 ```
 
 This version publishes the live Open-Meteo capability from a local MCP server.
@@ -152,8 +152,10 @@ agents_primer/
 │   ├── agents_using_apis.md       # Model API versus tool API
 │   └── direct_tools_vs_mcp.md     # Direct tools versus MCP
 └── mcp_examples/
-    ├── weather_server.py        # Local MCP weather server
-    ├── weather_agent.py         # Agent using the local MCP server
+    ├── local_weather/          # Complete local MCP weather example
+    │   ├── README.md
+    │   ├── weather_server.py  # Publishes the MCP weather tool
+    │   └── weather_agent.py   # Launches and uses the server
     ├── external_deepwiki_agent.py # Agent using a hosted MCP server
     ├── gmail_server.py / gmail_agent.py # Human-approved Gmail actions
     └── x_server.py / x_agent.py         # Human-approved X posting
