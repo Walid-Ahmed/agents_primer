@@ -2,14 +2,14 @@
 """Minimal Anthropic tool-use example with one tool-call round.
 
 Run from the repository root:
-    python anthropic/tool_use.py
+    python anthropic/one_round_tool_use.py
 
 The important lesson is that registering a tool does not force Claude to use it.
 Claude chooses whether to call it based on the prompt and tool description.
 
 This beginner example handles every tool call in Claude's first response, but it
 does not loop if Claude asks for another tool after seeing those results. See
-openai/tool_loop.py for the bounded while-loop pattern used by a real agent.
+openai/multi_round_tool_loop.py for the bounded while-loop pattern used by a real agent.
 
 Concept map:
 - Tool calling: YES. This is the main concept demonstrated here.
@@ -19,9 +19,11 @@ Concept map:
 """
 
 import os
+from typing import TextIO
 
 import anthropic
 from dotenv import load_dotenv
+from logging_utils import execution_log, log_message
 
 
 # 1. This is ordinary Python code. Claude cannot run it directly.
@@ -62,9 +64,10 @@ PROMPTS = [
 ]
 
 
-def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
+def run_prompt(client: anthropic.Anthropic, prompt: str, log_file: TextIO) -> None:
     """Ask Claude, report whether it called a tool, and finish the turn."""
     messages = [{"role": "user", "content": prompt}]
+    log_message(log_file, "User message", prompt)
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -73,6 +76,7 @@ def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
         # tool_choice defaults to "auto": Claude may use a tool or answer directly.
         messages=messages,
     )
+    log_message(log_file, "Assistant response", response.content)
 
     # 3. Never infer tool use from prose. Check for structured tool_use blocks.
     tool_calls = [block for block in response.content if block.type == "tool_use"]
@@ -82,11 +86,8 @@ def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
     print(f"STOP REASON: {response.stop_reason}")
 
     if not tool_calls:
-        # A direct answer arrives in one or more text blocks.
-        answer = "".join(
-            block.text for block in response.content if block.type == "text"
-        )
-        print(f"ANSWER: {answer}")
+        # A direct answer arrives in the first text block.
+        print(f"ANSWER: {response.content[0].text}")
         return
 
     # 4. Claude requested a tool; our application must execute it.
@@ -111,7 +112,10 @@ def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
     # This is one round only. Production agent code should inspect final_response
     # for more tool_use blocks and repeat until Claude returns a final answer.
     messages.append({"role": "assistant", "content": response.content})
+    # Anthropic uses the "user" role for tool results because they are input
+    # returned to Claude by our application, not because a human sent them.
     messages.append({"role": "user", "content": tool_results})
+    log_message(log_file, "Tool results returned as a user message", tool_results)
 
     final_response = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -119,9 +123,8 @@ def run_prompt(client: anthropic.Anthropic, prompt: str) -> None:
         tools=TOOLS,
         messages=messages,
     )
-    final_answer = "".join(
-        block.text for block in final_response.content if block.type == "text"
-    )
+    log_message(log_file, "Assistant final response", final_response.content)
+    final_answer = final_response.content[0].text
     print(f"TOOL RESULT: {tool_results[0]['content']}")
     print(f"FINAL ANSWER: {final_answer}")
 
@@ -132,8 +135,13 @@ def main() -> None:
         raise ValueError("Add ANTHROPIC_API_KEY to a .env file")
 
     client = anthropic.Anthropic()
-    for prompt in PROMPTS:
-        run_prompt(client, prompt)
+
+    # __file__ is the path of this Python script. The helper uses it to create
+    # a logs folder beside this file and opens a new timestamped log file.
+    # The with block closes the log automatically and then prints its location.
+    with execution_log(__file__) as log_file:
+        for prompt in PROMPTS:
+            run_prompt(client, prompt, log_file)
 
 
 if __name__ == "__main__":

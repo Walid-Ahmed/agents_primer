@@ -12,7 +12,7 @@ Flow:
 4. The server calls Open-Meteo and returns live weather.
 5. The Agents SDK completes the tool loop and returns the final answer.
 
-Unlike openai/api_tool_agent.py, this file does not define the tool schema or call
+Unlike openai/live_weather_api_agent.py, this file does not define the tool schema or call
 the weather function directly. The MCP server owns and publishes that capability.
 """
 

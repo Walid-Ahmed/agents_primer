@@ -120,11 +120,11 @@ Open-Meteo does not require an API key for this small non-commercial example. Yo
 still need an OpenAI API key because the application uses the OpenAI model API.
 
 ```bash
-python openai/api_tool_agent.py
+python openai/live_weather_api_agent.py
 ```
 
 The example asks about Toronto by default. Pass another city as an argument:
 
 ```bash
-python openai/api_tool_agent.py "Mexico City"
+python openai/live_weather_api_agent.py "Mexico City"
 ```

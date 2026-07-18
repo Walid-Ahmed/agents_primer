@@ -2,7 +2,7 @@
 """Minimal multi-round tool loop using OpenAI's Responses API.
 
 Run from the repository root:
-    python openai/tool_loop.py
+    python openai/multi_round_tool_loop.py
 
 The task needs two dependent tools:
 1. Find Alice's city.
@@ -102,7 +102,7 @@ def main() -> None:
     while tool_round < max_tool_rounds:
         calls = [item for item in response.output if item.type == "function_call"]
 
-        # No calls means the model has finished and returned its final answer.
+        # No calls means  the model has finished and returned its final answer.
         if not calls:
             print(f"\nFINAL ANSWER: {response.output_text}")
             return
@@ -119,6 +119,8 @@ def main() -> None:
 
             outputs.append(
                 {
+                    # This type identifies a structured API result, not a human speaker.
+                    # call_id links this result to the exact function call the model requested.
                     "type": "function_call_output",
                     "call_id": call.call_id,
                     "output": result,

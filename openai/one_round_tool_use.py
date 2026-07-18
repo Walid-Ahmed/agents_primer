@@ -2,14 +2,14 @@
 """Minimal OpenAI function-calling example with one tool-call round.
 
 Run from the repository root:
-    python openai/tool_use.py
+    python openai/one_round_tool_use.py
 
 Registering a function makes it available to the model. It does not guarantee
 that the model will call it; the prompt and tool description guide that choice.
 
 This beginner example handles every function call in the first response, but it
 does not loop if the model requests another function after seeing those results.
-See tool_loop.py for a bounded while-loop that supports multiple rounds.
+See multi_round_tool_loop.py for a bounded while-loop that supports multiple rounds.
 
 Concept map:
 - Tool calling: YES. This is the main concept demonstrated here.
@@ -20,9 +20,11 @@ Concept map:
 
 import json
 import os
+from typing import TextIO
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from logging_utils import execution_log, log_message
 
 
 # 1. This function runs in our application, not inside the model.
@@ -66,8 +68,10 @@ PROMPTS = [
 ]
 
 
-def run_prompt(client: OpenAI, prompt: str) -> None:
+def run_prompt(client: OpenAI, prompt: str, log_file: TextIO) -> None:
     """Ask the model, report function calls, then complete the tool-use loop."""
+    log_message(log_file, "User input", prompt)
+
     response = client.responses.create(
         # GPT-5 nano is the cheapest GPT-5 model and supports function calling.
         model="gpt-5-nano",
@@ -75,6 +79,7 @@ def run_prompt(client: OpenAI, prompt: str) -> None:
         tools=TOOLS,  # Makes get_weather available to the model.
         # tool_choice defaults to "auto": zero or more calls are allowed.
     )
+    log_message(log_file, "Model response", response.model_dump())
 
     # 3. Check structured output items. Do not infer tool use from response text.
     function_calls = [
@@ -101,11 +106,15 @@ def run_prompt(client: OpenAI, prompt: str) -> None:
 
         function_outputs.append(
             {
+                # This type identifies a structured API result, not a human speaker.
+                # call_id links this result to the exact function call the model requested.
                 "type": "function_call_output",
                 "call_id": call.call_id,
                 "output": result,
             }
         )
+
+    log_message(log_file, "Function outputs returned to model", function_outputs)
 
     # 5. Continue the same response with the results from our application.
     # This is one round only. A full agent must inspect final_response for more
@@ -116,6 +125,7 @@ def run_prompt(client: OpenAI, prompt: str) -> None:
         input=function_outputs,
         tools=TOOLS,
     )
+    log_message(log_file, "Model final response", final_response.model_dump())
 
     print(f"TOOL RESULT: {function_outputs[0]['output']}")
     print(f"FINAL ANSWER: {final_response.output_text}")
@@ -127,8 +137,12 @@ def main() -> None:
         raise ValueError("Add OPENAI_API_KEY to a .env file")
 
     client = OpenAI()
-    for prompt in PROMPTS:
-        run_prompt(client, prompt)
+
+    # The helper creates openai/logs/, opens a timestamped file, closes it at
+    # the end of the with block, and prints the full log path.
+    with execution_log(__file__) as log_file:
+        for prompt in PROMPTS:
+            run_prompt(client, prompt, log_file)
 
 
 if __name__ == "__main__":

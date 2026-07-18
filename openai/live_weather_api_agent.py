@@ -2,8 +2,8 @@
 """Minimal agent whose tool calls a real external weather API.
 
 Run from the repository root:
-    python openai/api_tool_agent.py
-    python openai/api_tool_agent.py "Mexico City"
+    python openai/live_weather_api_agent.py
+    python openai/live_weather_api_agent.py "Mexico City"
 
 Two different APIs are involved:
 1. This application calls the OpenAI Responses API to ask the model what to do.
@@ -29,9 +29,12 @@ from openai import OpenAI
 
 def get_json(url: str, params: dict) -> dict:
     """Make a small GET request and parse its JSON response."""
+    # urlencode turns the parameters into a query string such as
+    # name=Toronto&count=1. The external API receives the completed URL.
     request_url = f"{url}?{urlencode(params)}"
     # A timeout prevents an unavailable service from hanging the agent forever.
     with urlopen(request_url, timeout=10) as response:
+        # json.load converts the HTTP response body from JSON into a Python dict.
         return json.load(response)
 
 
@@ -43,9 +46,11 @@ def get_current_weather(city: str) -> str:
         {"name": city, "count": 1, "language": "en", "format": "json"},
     )
     results = places.get("results", [])
+    # Return an error as tool output so the model can explain it to the user.
     if not results:
         return json.dumps({"error": f"City not found: {city}"})
 
+    # count=1 requested only the best matching location.
     place = results[0]
 
     # External API call 2: request current conditions for those coordinates.
@@ -71,6 +76,7 @@ def get_current_weather(city: str) -> str:
     )
 
 
+# This schema describes the Python function to the model. It does not execute it.
 WEATHER_TOOL = {
     "type": "function",
     "name": "get_current_weather",
@@ -86,6 +92,7 @@ WEATHER_TOOL = {
         "required": ["city"],
         "additionalProperties": False,
     },
+    # Strict mode requires the model's arguments to follow this schema exactly.
     "strict": True,
 }
 
@@ -95,6 +102,7 @@ def main() -> None:
     if not os.getenv("OPENAI_API_KEY"):
         raise ValueError("Add OPENAI_API_KEY to a .env file")
 
+    # Use a city supplied on the command line, or Toronto when none is supplied.
     city = sys.argv[1] if len(sys.argv) > 1 else "Toronto"
     client = OpenAI()
 
@@ -105,19 +113,28 @@ def main() -> None:
         tools=[WEATHER_TOOL],
     )
 
+    # A response can contain several item types. Select only structured calls;
+    # do not guess that the model wants a tool based on its written text.
     calls = [item for item in response.output if item.type == "function_call"]
     if not calls:
+        # The model answered directly, so there is no Python tool to execute.
         print(response.output_text)
         return
 
+    # Store every tool result because a model may request multiple calls at once.
     outputs = []
     for call in calls:
+        # Function arguments arrive as a JSON string. Convert them to a dict.
         arguments = json.loads(call.arguments)
+
+        # The model selected the function; our Python application executes it.
         result = get_current_weather(arguments["city"])
         print(f"TOOL: {call.name}({arguments})")
         print(f"EXTERNAL API RESULT: {result}")
         outputs.append(
             {
+                # This type identifies a structured API result, not a human speaker.
+                # call_id links this result to the exact function call the model requested.
                 "type": "function_call_output",
                 "call_id": call.call_id,
                 "output": result,
@@ -127,6 +144,7 @@ def main() -> None:
     # Model API call 2: give the external API result back for a natural answer.
     final_response = client.responses.create(
         model="gpt-5-nano",
+        # This connects the tool results to the model response that requested them.
         previous_response_id=response.id,
         input=outputs,
         tools=[WEATHER_TOOL],

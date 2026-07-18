@@ -24,7 +24,7 @@ MCP separates the capability provider from the AI application:
 - `weather_server.py` owns the tool and calls Open-Meteo.
 - `weather_agent.py` connects to the server and uses whatever tools it publishes.
 
-The direct version in `openai/api_tool_agent.py` declares the schema, executes the
+The direct version in `openai/live_weather_api_agent.py` declares the schema, executes the
 function, and returns the result itself. The MCP version moves that interface and
 execution behind a standard protocol.
 

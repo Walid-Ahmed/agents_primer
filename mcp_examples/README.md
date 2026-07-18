@@ -129,7 +129,7 @@ exactly `POST`.
 
 ## 7. Direct tools versus MCP
 
-The repository's `openai/api_tool_agent.py` registers the weather function
+The repository's `openai/live_weather_api_agent.py` registers the weather function
 directly with OpenAI. In the local MCP example, the server publishes the function
 through a standard protocol and the agent discovers its schema at runtime.
 
